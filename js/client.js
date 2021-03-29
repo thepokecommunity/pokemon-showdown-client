@@ -3,6 +3,12 @@ function toId() {
 	alert("You have an old extension/script for Pokemon Showdown which is incompatible with this client. It needs to be removed or updated.");
 }
 
+function postProxy(a, b, callback) {
+	var datastring = ((a.split('?').length - 1 > 0) ? "&" : "?") + "post=";
+	for (var i in b) datastring += escape(i) + "|";
+	$.post(a + datastring, b, callback);
+}
+
 (function ($) {
 
 	Config.sockjsprefix = '/showdown';
@@ -286,7 +292,7 @@ function toId() {
 
 			if (this.get('userid') !== userid) {
 				var self = this;
-				$.post(this.getActionPHP(), {
+				postProxy(this.getActionPHP(), {
 					act: 'getassertion',
 					userid: userid,
 					challstr: this.challstr
@@ -299,7 +305,7 @@ function toId() {
 		},
 		passwordRename: function (name, password, special) {
 			var self = this;
-			$.post(this.getActionPHP(), {
+			postProxy(this.getActionPHP(), {
 				act: 'login',
 				name: name,
 				pass: password,
@@ -340,7 +346,7 @@ function toId() {
 				 */
 				this.challstr = challstr;
 				var self = this;
-				$.post(this.getActionPHP(), {
+				postProxy(this.getActionPHP(), {
 					act: 'upkeep',
 					challstr: this.challstr
 				}, Storage.safeJSON(function (data) {
@@ -367,7 +373,7 @@ function toId() {
 		 * Log out from the server (but remain connected as a guest).
 		 */
 		logout: function () {
-			$.post(this.getActionPHP(), {
+			postProxy(this.getActionPHP(), {
 				act: 'logout',
 				userid: this.get('userid')
 			});
@@ -1026,7 +1032,7 @@ function toId() {
 
 				var userid = toUserid(parsed.name);
 				if (userid === this.user.get('userid') && parsed.name !== this.user.get('name')) {
-					$.post(app.user.getActionPHP(), {
+					postProxy(app.user.getActionPHP(), {
 						act: 'changeusername',
 						username: parsed.name
 					}, function () {}, 'text');
@@ -1320,7 +1326,7 @@ function toId() {
 			var serverid = Config.server.id && toID(Config.server.id.split(':')[0]);
 			var silent = data.silent;
 			if (serverid && serverid !== 'showdown') id = serverid + '-' + id;
-			$.post(app.user.getActionPHP() + '?act=uploadreplay', {
+			postProxy(app.user.getActionPHP() + '?act=uploadreplay', {
 				log: data.log,
 				password: data.password || '',
 				id: id
