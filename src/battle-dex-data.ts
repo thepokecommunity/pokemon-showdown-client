@@ -258,6 +258,7 @@ const BattlePokemonIconIndexes: {[id: string]: number} = {
 	furfroustar: 900 + 114,
 	meowsticf: 900 + 115,
 	aegislashblade: 900 + 116,
+	xerneasneutral: 900 + 117,
 	hoopaunbound: 900 + 118,
 	rattataalola: 900 + 119,
 	raticatealola: 900 + 120,
@@ -479,6 +480,7 @@ const BattlePokemonIconIndexes: {[id: string]: number} = {
 	equilibra: 1308 + 28,
 	astrolotl: 1308 + 29,
 	miasmaw: 1308 + 30,
+	chromera: 1308 + 31,
 
 	syclar: 1344 + 0,
 	embirch: 1344 + 1,
@@ -1229,6 +1231,7 @@ class Move implements Effect {
 			} else {
 				this.zMove.basePower = 100;
 			}
+			if (data.zMove) this.zMove.basePower = data.zMove.basePower;
 		}
 
 		this.num = data.num || 0;
@@ -1394,9 +1397,9 @@ class Species implements Effect {
 		this.tier = data.tier || '';
 
 		this.isTotem = false;
-		this.isMega = false;
+		this.isMega = !!(this.forme && ['-mega', '-megax', '-megay'].includes(this.formeid));
 		this.canGigantamax = !!data.canGigantamax;
-		this.isPrimal = false;
+		this.isPrimal = !!(this.forme && this.formeid === '-primal');
 		this.battleOnly = data.battleOnly || undefined;
 		this.isNonstandard = data.isNonstandard || null;
 		this.unreleasedHidden = data.unreleasedHidden || false;
@@ -1406,13 +1409,8 @@ class Species implements Effect {
 				this.gen = 8;
 			} else if (this.num >= 722 || this.formeid === '-alola' || this.formeid === '-starter') {
 				this.gen = 7;
-			} else if (this.forme && ['-mega', '-megax', '-megay'].includes(this.formeid)) {
+			} else if (this.isMega || this.isPrimal) {
 				this.gen = 6;
-				this.isMega = true;
-				this.battleOnly = this.baseSpecies;
-			} else if (this.formeid === '-primal') {
-				this.gen = 6;
-				this.isPrimal = true;
 				this.battleOnly = this.baseSpecies;
 			} else if (this.formeid === '-totem' || this.formeid === '-alolatotem') {
 				this.gen = 7;
@@ -1432,6 +1430,12 @@ class Species implements Effect {
 			}
 		}
 	}
+}
+
+interface Type extends Effect {
+	damageTaken?: AnyObject;
+	HPivs?: Partial<StatsTable>;
+	HPdvs?: Partial<StatsTable>;
 }
 
 if (typeof require === 'function') {

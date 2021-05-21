@@ -304,9 +304,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 
 		if (request.side) {
 			room.battle.myPokemon = request.side.pokemon;
-			if (room.battle.sidesSwitched !== !!(request.side.id === 'p2')) {
-				room.battle.switchSides();
-			}
+			room.battle.setPerspective(request.side.id);
 			room.side = request.side;
 		}
 
@@ -351,7 +349,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				return <div class="message-error">Maxed with no max moves</div>;
 			}
 			return active.moves.map((moveData, i) => {
-				const move = dex.getMove(moveData.name);
+				const move = dex.moves.get(moveData.name);
 				const maxMoveData = active.maxMoves![i];
 				const gmaxTooltip = maxMoveData.id.startsWith('gmax') ? `|${maxMoveData.id}` : ``;
 				const tooltip = `maxmove|${moveData.name}|${pokemonIndex}${gmaxTooltip}`;
@@ -366,7 +364,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 				return <div class="message-error">No Z moves</div>;
 			}
 			return active.moves.map((moveData, i) => {
-				const move = dex.getMove(moveData.name);
+				const move = dex.moves.get(moveData.name);
 				const zMoveData = active.zMoves![i];
 				if (!zMoveData) {
 					return <button disabled>&nbsp;</button>;
@@ -379,7 +377,7 @@ class BattlePanel extends PSRoomPanel<BattleRoom> {
 		}
 
 		return active.moves.map((moveData, i) => {
-			const move = dex.getMove(moveData.name);
+			const move = dex.moves.get(moveData.name);
 			const tooltip = `move|${moveData.name}|${pokemonIndex}`;
 			return <MoveButton cmd={`/move ${i + 1}`} type={move.type} tooltip={tooltip} moveData={moveData}>
 				{move.name}

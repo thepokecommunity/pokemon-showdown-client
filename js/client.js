@@ -408,7 +408,7 @@ function postProxy(a, b, callback) {
 			this.supports = {};
 
 			// down
-			// if (document.location.hostname === 'play.pokemonshowdown.com') this.down = 'dos';
+			// if (document.location.hostname === 'play.pokemonshowdown.com') this.down = true;
 
 			this.addRoom('');
 			this.topbar = new Topbar({el: $('#header')});
@@ -461,6 +461,7 @@ function postProxy(a, b, callback) {
 					if (Object.keys(settings).length) app.user.set('settings', settings);
 					// HTML5 history throws exceptions when running on file://
 					Backbone.history.start({pushState: !Config.testclient});
+					app.ignore = app.loadIgnore();
 				});
 			}
 
@@ -821,7 +822,7 @@ function postProxy(a, b, callback) {
 		 * Send to sim server
 		 */
 		send: function (data, room) {
-			if (room && room !== 'lobby' && room !== true) {
+			if (room && room !== true) {
 				data = room + '|' + data;
 			} else if (room !== true) {
 				data = '|' + data;
@@ -836,15 +837,18 @@ function postProxy(a, b, callback) {
 			}
 			this.socket.send(data);
 		},
-		serializeForm: function (form) {
+		serializeForm: function (form, checkboxOnOff) {
 			// querySelector dates back to IE8 so we can use it
 			// fortunate, because form serialization is a HUGE MESS in older browsers
 			var elements = form.querySelectorAll('input[name], select[name], textarea[name], keygen[name]');
 			var out = [];
 			for (var i = 0; i < elements.length; i++) {
 				var element = elements[i];
-				// TODO: values are a mess in the DOM; checkboxes/select probably need special handling
-				out.push([element.name, element.value]);
+				if (element.type === 'checkbox' && !element.value && checkboxOnOff) {
+					out.push([element.name, element.checked ? 'on' : 'off']);
+				} else if (!['checkbox', 'radio'].includes(element.type) || element.checked) {
+					out.push([element.name, element.value]);
+				}
 			}
 			return out;
 		},
@@ -857,10 +861,11 @@ function postProxy(a, b, callback) {
 			var dataSend = target.getAttribute('data-submitsend');
 			if (dataSend) {
 				var toSend = dataSend;
-				var entries = this.serializeForm(target);
+				var entries = this.serializeForm(target, true);
 				for (var i = 0; i < entries.length; i++) {
 					toSend = toSend.replace('{' + entries[i][0] + '}', entries[i][1]);
 				}
+				toSend = toSend.replace(/\{[a-z]+\}/g, '');
 				this.send(toSend);
 				e.currentTarget.innerText = 'Submitted!';
 				e.preventDefault();
@@ -943,7 +948,7 @@ function postProxy(a, b, callback) {
 					var replayLink = 'https://' + Config.routes.replays + '/' + replayid;
 					$.ajax(replayLink + '.json', {dataType: 'json'}).done(function (replay) {
 						if (replay) {
-							var title = BattleLog.escapeHTML(replay.p1) + ' vs. ' + BattleLog.escapeHTML(replay.p2);
+							var title = replay.p1 + ' vs. ' + replay.p2;
 							app.receive('>battle-' + replayid + '\n|init|battle\n|title|' + title + '\n' + replay.log);
 							app.receive('>battle-' + replayid + '\n|expire|<a href=' + replayLink + ' target="_blank" class="no-panel-intercept">Open replay in new tab</a>');
 						} else {
@@ -1064,6 +1069,7 @@ function postProxy(a, b, callback) {
 				}
 				if (app.ignore[userid]) {
 					delete app.ignore[userid];
+					app.saveIgnore();
 				}
 				break;
 
@@ -1164,6 +1170,18 @@ function postProxy(a, b, callback) {
 				break;
 			}
 		},
+		saveIgnore: function () {
+			Storage.prefs('ignorelist', Object.keys(this.ignore));
+		},
+		loadIgnore: function () {
+			var ignoreList = Storage.prefs('ignorelist');
+			if (!ignoreList) return {};
+			var ignore = {};
+			for (var i = 0; i < ignoreList.length; i++) {
+				ignore[ignoreList[i]] = 1;
+			}
+			return ignore;
+		},
 		parseGroups: function (groupsList) {
 			var data = null;
 			try {
@@ -1200,6 +1218,7 @@ function postProxy(a, b, callback) {
 			var column = 0;
 			var columnChanged = false;
 
+			window.NonBattleGames = {rps: 'Rock Paper Scissors'};
 			window.BattleFormats = {};
 			for (var j = 1; j < formatsList.length; j++) {
 				if (isSection) {
@@ -1263,6 +1282,8 @@ function postProxy(a, b, callback) {
 						}
 						if (teambuilderFormatName !== name) {
 							teambuilderFormat = toID(teambuilderFormatName);
+							if (teambuilderFormat.startsWith('gen8nd')) teambuilderFormat = 'gen8nationaldex' + teambuilderFormat.slice(6);
+							if (teambuilderFormat.startsWith('gen8natdex')) teambuilderFormat = 'gen8nationaldex' + teambuilderFormat.slice(10);
 							if (BattleFormats[teambuilderFormat]) {
 								BattleFormats[teambuilderFormat].isTeambuilderFormat = true;
 							} else {
@@ -1526,9 +1547,9 @@ function postProxy(a, b, callback) {
 
 			// otherwise, infer the room type
 			if (!type) {
-				if (id.slice(0, 7) === 'battle-') {
+				if (id.startsWith('battle-') || id.startsWith('game-')) {
 					type = BattleRoom;
-				} else if (id.slice(0, 5) === 'view-') {
+				} else if (id.startsWith('view-')) {
 					type = HTMLRoom;
 				} else {
 					type = ChatRoom;
@@ -2600,6 +2621,10 @@ function postProxy(a, b, callback) {
 			if (globalGroupName) {
 				buf += '<small class="usergroup globalgroup">' + globalGroupName + '</small>';
 			}
+			if (data.customgroup) {
+				if (groupName || globalGroupName) buf += '<br />';
+				buf += '<small class="usergroup globalgroup">' + BattleLog.escapeHTML(data.customgroup) + '</small>';
+			}
 			if (data.rooms) {
 				var battlebuf = '';
 				var chatbuf = '';
@@ -2718,6 +2743,7 @@ function postProxy(a, b, callback) {
 				app.ignore[this.userid] = 1;
 				buf += " ignored. (Moderator messages will not be ignored.)";
 			}
+			app.saveIgnore();
 			var $pm = $('.pm-window-' + this.userid);
 			if ($pm.length && $pm.css('display') !== 'none') {
 				$pm.find('.inner').append('<div class="chat">' + BattleLog.escapeHTML(buf) + '</div>');

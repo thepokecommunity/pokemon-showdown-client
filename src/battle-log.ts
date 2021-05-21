@@ -210,6 +210,14 @@ class BattleLog {
 			divHTML = '<div class="chat"><small style="color:#999">[DEBUG] ' + BattleLog.escapeHTML(args[1]) + '.</small></div>';
 			break;
 
+		case 'notify':
+			const title = args[1];
+			const body = args[2];
+			const roomid = this.scene?.battle.roomid;
+			if (!roomid) break;
+			app.rooms[roomid].notifyOnce(title, body, 'highlight');
+			break;
+
 		case 'seed': case 'choice': case ':': case 'timer': case 't:':
 		case 'J': case 'L': case 'N': case 'spectator': case 'spectatorleave':
 		case 'initdone':
@@ -457,6 +465,9 @@ class BattleLog {
 		}
 		if (window.BattleFormats && BattleFormats[formatid]) {
 			return this.escapeHTML(BattleFormats[formatid].name);
+		}
+		if (window.NonBattleGames && NonBattleGames[formatid]) {
+			return this.escapeHTML(NonBattleGames[formatid]);
 		}
 		return this.escapeHTML(formatid);
 	}
@@ -810,7 +821,7 @@ class BattleLog {
 				return {
 					tagName: 'iframe',
 					attribs: [
-						'src', `https://player.twitch.tv/?channel=${channelId}&parent=${location.hostname}`,
+						'src', `https://player.twitch.tv/?channel=${channelId}&parent=${location.hostname}&autoplay=false`,
 						'allowfullscreen', 'true', 'height', "400", 'width', "340",
 					],
 				};
@@ -843,9 +854,15 @@ class BattleLog {
 				const videoId = /(?:\?v=|\/embed\/)([A-Za-z0-9_\-]+)/.exec(src)?.[1];
 				if (!videoId) return {tagName: 'img', attribs: ['alt', `invalid src for <youtube>`]};
 
+				const time = /(?:\?|&)(?:t|start)=([0-9]+)/.exec(src)?.[1];
+
 				return {
 					tagName: 'iframe',
-					attribs: ['width', width, 'height', height, 'src', `https://www.youtube.com/embed/${videoId}`, 'frameborder', '0', 'allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture', 'allowfullscreen', 'allowfullscreen'],
+					attribs: [
+						'width', width, 'height', height,
+						'src', `https://www.youtube.com/embed/${videoId}${time ? `?start=${time}` : ''}`,
+						'frameborder', '0', 'allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture', 'allowfullscreen', 'allowfullscreen',
+					],
 				};
 			} else if (tagName === 'psicon') {
 				// <psicon> is a custom element which supports a set of mutually incompatible attributes:

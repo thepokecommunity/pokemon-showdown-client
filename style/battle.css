@@ -14,6 +14,7 @@ License: GPLv2
 	left: -1px;
 	border: 1px solid #AAAAAA;
 	background: #CFD5DA;
+	color: black;
 	width: 640px;
 	height: 360px;
 	overflow: hidden;
@@ -345,8 +346,9 @@ License: GPLv2
 	background: transparent none no-repeat scroll center top;
 }
 .trainer div.teamicons {
-	width: 96px;
+	width: 100px;
 	height: 30px;
+	margin: 0 0 0 2px;
 }
 .teamicons span {
 	float: left;
