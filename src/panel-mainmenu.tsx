@@ -389,9 +389,9 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 					<small>
 						<a href={`//${Config.routes.dex}/`} target="_blank">Pok&eacute;dex</a> | {}
 						<a href={`//${Config.routes.replays}/`} target="_blank">Replays</a> | {}
-						<a href={`//${Config.routes.root}/rules`} target="_blank">Rules</a> | {}
+						<a href={`https://www.pokecommunity.com/showthread.php?t=434307`} target="_blank">Rules</a> | {}
 						<a href={`//${Config.routes.dex}/credits`} target="_blank">Credits</a> | {}
-						<a href="//smogon.com/forums/" target="_blank">Forum</a>
+						<a href="https://www.pokecommunity.com/" target="_blank">Forum</a>
 					</small>
 				</div>
 			</div>
