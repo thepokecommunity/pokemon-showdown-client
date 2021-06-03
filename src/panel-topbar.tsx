@@ -223,7 +223,7 @@ class PSHeader extends preact.Component<{style: {}}> {
 				src={`https://${Config.routes.client}/pokemonshowdownbeta.png`}
 				srcset={`https://${Config.routes.client}/pokemonshowdownbeta@2x.png 2x`}
 				alt="Pokémon Showdown! (beta)"
-				width="146" height="44"
+				width="51" height="44"
 			/>
 			<div class="maintabbarbottom"></div>
 			<div class="tabbar maintabbar"><div class="inner">
@@ -233,7 +233,7 @@ class PSHeader extends preact.Component<{style: {}}> {
 				<ul>
 					{PS.leftRoomList.slice(1).map(roomid => this.renderRoomTab(roomid))}
 				</ul>
-				<ul class="siderooms" style={{float: 'none', marginLeft: PS.leftRoomWidth - 144}}>
+				<ul class="siderooms" style={{float: 'none', marginLeft: PS.leftRoomWidth - 49}}>
 					{PS.rightRoomList.map(roomid => this.renderRoomTab(roomid))}
 				</ul>
 			</div></div>
