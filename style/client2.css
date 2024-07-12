@@ -13,7 +13,7 @@ body {
 	font-size: 11pt;
 	font-family: Verdana, Helvetica, Arial, sans-serif;
 
-	/* see http://pokemonshowdown.com/credits */
+	/* see https://pokemonshowdown.com/credits */
 	background: #344b6c url(../fx/client-bg-charizards.jpg) no-repeat left center fixed;
 	-webkit-background-size: cover;
 	-moz-background-size: cover;
@@ -148,6 +148,11 @@ body {
 .username {
 	cursor: pointer;
 }
+@media (max-width: 500px) {
+	.usernametext {
+		display: none
+	}
+}
 .userbar button.icon {
 	height: 25px;
 	width: 27px;
@@ -195,8 +200,8 @@ body {
 	box-shadow: 0 1px 2px rgba(0,0,0,.2);
 }
 .tabbar.maintabbar {
-	margin-left: 42px;
-	margin-right: 267px;
+	margin-left: 144px;
+	margin-right: 165px;
 	overflow: hidden;
 }
 .tabbar.maintabbar.minitabbar {
@@ -1142,6 +1147,7 @@ a.ilink.yours {
 	overflow: hidden;
 	transition: max-height 0.15s;
 	-webkit-transition: max-height 0.15s;
+	touch-action: none;
 }
 
 .tournament-bracket {
@@ -1149,6 +1155,7 @@ a.ilink.yours {
 	padding: 10px;
 	overflow: hidden;
 	font-size: 8pt;
+	touch-action: none;
 }
 .tournament-bracket-overflowing {
 	height: 200px;
@@ -1156,6 +1163,7 @@ a.ilink.yours {
 	position: relative;
 	left: 0;
 	top: 0;
+	touch-action: none;
 }
 
 .tournament-popout-link {
@@ -1346,6 +1354,10 @@ a.ilink.yours {
 	overflow: auto;
 	-webkit-overflow-scrolling: touch;
 	overflow-scrolling: touch;
+}
+.userlist-count {
+	text-align: center;
+	padding: 2px 0;
 }
 .userlist-minimized {
 	height: 21px;
@@ -1981,7 +1993,7 @@ a.ilink.yours {
 .avatarlist button {
 	width: 80px;
 	height: 80px;
-	background: transparent url(//play.pokemonshowdown.com/sprites/trainers-sheet.png) no-repeat scroll 0px 0px;
+	background: transparent url(https://play.pokemonshowdown.com/sprites/trainers-sheet.png) no-repeat scroll 0px 0px;
 }
 .bglist button span {
 	display: block;
@@ -2172,6 +2184,9 @@ a.ilink.yours {
 
 .dark .highlighted {
 	background: rgba(120,220,255,0.28);
+}
+.dark .message-pm {
+	color: #00af00;
 }
 .dark .revealed {
 	background: rgba(0,255,200,0.18);

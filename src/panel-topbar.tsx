@@ -203,17 +203,17 @@ class PSHeader extends preact.Component<{style: {}}> {
 	}
 	renderUser() {
 		if (!PS.connected) {
-			return <button class="button disabled" disabled><em>Offline</em></button>;
+			return <button class="button" disabled><em>Offline</em></button>;
 		}
 		if (!PS.user.userid) {
-			return <button class="button disabled" disabled><em>Connecting...</em></button>;
+			return <button class="button" disabled><em>Connecting...</em></button>;
 		}
 		if (!PS.user.named) {
 			return <a class="button" href="login">Choose name</a>;
 		}
 		const userColor = window.BattleLog && {color: BattleLog.usernameColor(PS.user.userid)};
 		return <span class="username" data-name={PS.user.name} style={userColor}>
-			<i class="fa fa-user" style="color:#779EC5"></i> {PS.user.name}
+			<i class="fa fa-user" style="color:#779EC5"></i> <span class="usernametext">{PS.user.name}</span>
 		</span>;
 	}
 	render() {
@@ -223,7 +223,7 @@ class PSHeader extends preact.Component<{style: {}}> {
 				src={`https://${Config.routes.client}/pokemonshowdownbeta.png`}
 				srcset={`https://${Config.routes.client}/pokemonshowdownbeta@2x.png 2x`}
 				alt="Pokémon Showdown! (beta)"
-				width="44" height="44"
+				width="146" height="44"
 			/>
 			<div class="maintabbarbottom"></div>
 			<div class="tabbar maintabbar"><div class="inner">
@@ -233,7 +233,7 @@ class PSHeader extends preact.Component<{style: {}}> {
 				<ul>
 					{PS.leftRoomList.slice(1).map(roomid => this.renderRoomTab(roomid))}
 				</ul>
-				<ul class="siderooms" style={{float: 'none', marginLeft: PS.leftRoomWidth - 42}}>
+				<ul class="siderooms" style={{float: 'none', marginLeft: PS.leftRoomWidth - 144}}>
 					{PS.rightRoomList.map(roomid => this.renderRoomTab(roomid))}
 				</ul>
 			</div></div>
@@ -366,8 +366,8 @@ class UserPanel extends PSRoomPanel<UserRoom> {
 			</div>
 			{isSelf || !PS.user.named ?
 				<p class="buttonbar">
-					<button class="button disabled" disabled>Challenge</button> {}
-					<button class="button disabled" disabled>Chat</button>
+					<button class="button" disabled>Challenge</button> {}
+					<button class="button" disabled>Chat</button>
 				</p>
 			:
 				<p class="buttonbar">
@@ -450,9 +450,9 @@ PS.roomTypes['volume'] = {
 };
 
 class OptionsPanel extends PSRoomPanel {
-	setCheckbox = (e: Event) => {
-		const checkbox = e.currentTarget as HTMLInputElement;
-		PS.prefs.set(checkbox.name as 'dark', !!checkbox.checked);
+	setTheme = (e: Event) => {
+		const theme = (e.currentTarget as HTMLSelectElement).value as 'light' | 'dark' | 'system';
+		PS.prefs.set('theme', theme);
 		this.forceUpdate();
 	};
 	render() {
@@ -460,7 +460,11 @@ class OptionsPanel extends PSRoomPanel {
 		return <PSPanelWrapper room={room}>
 			<h3>Graphics</h3>
 			<p>
-				<label class="checkbox"><input type="checkbox" name="dark" checked={PS.prefs.dark} onChange={this.setCheckbox} /> Dark mode</label>
+				<label class="optlabel">Theme: <select onChange={this.setTheme}>
+					<option value="light" selected={PS.prefs.theme === 'light'}>Light</option>
+					<option value="dark" selected={PS.prefs.theme === 'dark'}>Dark</option>
+					<option value="system" selected={PS.prefs.theme === 'system'}>Match system theme</option>
+				</select></label>
 			</p>
 		</PSPanelWrapper>;
 	}

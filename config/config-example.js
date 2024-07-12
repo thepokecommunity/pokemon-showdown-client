@@ -19,11 +19,11 @@ Config.whitelist = [
 // address bar is `Config.routes.client`.
 Config.defaultserver = {
 	id: 'pokecommunity',
-	host: 'battle.pokecommunity.com',
+	host: '45.77.103.249',
 	port: 8000,
 	httpport: 8000,
 	altport: 80,
-	registered: true
+	registered: false
 };
 
 Config.roomsFirstOpenScript = function () {

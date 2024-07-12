@@ -97,6 +97,9 @@ class MainMenuRoom extends PSRoom {
 		let column = 0;
 
 		window.NonBattleGames = {rps: 'Rock Paper Scissors'};
+		for (let i = 3; i <= 9; i = i + 2) {
+			window.NonBattleGames['bestof' + i] = 'Best-of-' + i;
+		}
 		window.BattleFormats = {};
 		for (let j = 1; j < formatsList.length; j++) {
 			const entry = formatsList[j];
@@ -389,9 +392,9 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 					<small>
 						<a href={`//${Config.routes.dex}/`} target="_blank">Pok&eacute;dex</a> | {}
 						<a href={`//${Config.routes.replays}/`} target="_blank">Replays</a> | {}
-						<a href={`https://www.pokecommunity.com/showthread.php?t=434307`} target="_blank">Rules</a> | {}
+						<a href={`//${Config.routes.root}/rules`} target="_blank">Rules</a> | {}
 						<a href={`//${Config.routes.dex}/credits`} target="_blank">Credits</a> | {}
-						<a href="https://www.pokecommunity.com/" target="_blank">Forum</a>
+						<a href="//smogon.com/forums/" target="_blank">Forum</a>
 					</small>
 				</div>
 			</div>
